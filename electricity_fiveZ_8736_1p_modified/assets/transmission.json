@@ -1,0 +1,136 @@
+{
+    "ElectricityTransmission": {
+        "type": "TransmissionLink",
+        "global_data": {
+            "commodity": "Electricity",
+            "transmission_constraints": {
+                "MaxCapacityConstraint": true
+            },
+            "lifetime": 50,
+            "investment_cost": 509.94,
+            "loss_fraction": 0.035
+        },
+        "instance_data": [
+            {
+                "id": "NR_to_ER",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_NR",
+                "transmission_dest": "elec_ER",
+                "existing_capacity": 38.05,
+                "max_capacity": 16000,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "NR_to_WR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_NR",
+                "transmission_dest": "elec_WR",
+                "existing_capacity":3206.16 ,
+                "max_capacity": 24700,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "NR_to_NER",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_NR",
+                "transmission_dest": "elec_NER",
+                "existing_capacity":261.93 ,
+                "max_capacity": 24700,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "WR_to_ER",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_WR",
+                "transmission_dest": "elec_ER",
+                "existing_capacity": 844.75,
+                "max_capacity": 22000,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "ER_to_NER",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_ER",
+                "transmission_dest": "elec_NER",
+                "existing_capacity": 12.16,
+                "max_capacity": 6650,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "WR_to_SR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_WR",
+                "transmission_dest": "elec_SR",
+                "existing_capacity": 5367.41,
+                "max_capacity":64700,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "ER_to_SR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_ER",
+                "transmission_dest": "elec_SR",
+                "existing_capacity":3292.55,
+                "max_capacity": 24575,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "ER_to_WR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_ER",
+                "transmission_dest": "elec_WR",
+                "existing_capacity":925.41,
+                "max_capacity": 24575,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "NER_to_ER",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_NER",
+                "transmission_dest": "elec_ER",
+                "existing_capacity":269.78,
+                "max_capacity": 13350,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "SR_to_WR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_SR",
+                "transmission_dest": "elec_WR",
+                "existing_capacity":656.84,
+                "max_capacity": 29700,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "ER_to_NR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_ER",
+                "transmission_dest": "elec_NR",
+                "existing_capacity":1649.75,
+                "max_capacity": 26800,
+                "max_new_capacity": 0
+                
+            },
+            {
+                "id": "WR_to_NR",
+                "commodity": "Electricity",
+                "transmission_origin": "elec_WR",
+                "transmission_dest": "elec_NR",
+                "existing_capacity":4103.96,
+                "max_capacity": 88700,
+                "max_new_capacity": 0
+                
+            }
+        ]
+    }
+}
