@@ -5,6 +5,7 @@
             "id": "NG_CCGT",
                 "timedata": "NaturalGas",
                 "fuel_commodity": "NaturalGas",
+                "fuel_start_vertex": "naturalgas_source",
                 "co2_sink": "co2_sink",
                 "uc": true,
                 "elec_constraints": {
