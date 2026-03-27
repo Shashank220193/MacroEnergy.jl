@@ -5,6 +5,7 @@ using Random
 using MacroEnergy
 using CSV
 using DataFrames
+using OrderedCollections: OrderedDict
 import MacroEnergy:
     TimeData,
     compute_annualized_costs!,
@@ -21,6 +22,7 @@ import MacroEnergy:
     time_interval,
     start_vertex,
     price,
+    price_supply,
     total_years,
     present_value_factor,
     present_value_annuity_factor,
@@ -31,6 +33,8 @@ import MacroEnergy:
     new_capacity,
     storage_level,
     non_served_demand,
+    supply_flow,
+    supply_segments,
     segments_non_served_demand,
     price_non_served_demand,
     max_non_served_demand,
@@ -63,7 +67,7 @@ import MacroEnergy:
     Node,
     Storage,
     Transformation,
-    Edge,
+    UnidirectionalEdge,
     filter_edges_by_commodity!,
     write_curtailment,
     write_time_weights,
@@ -83,9 +87,12 @@ function test_writing_output()
             subperiod_weights=Dict(1 => 0.3, 2 => 0.5, 3 => 0.2)
         ),
         price = [10.0, 11.0, 12.0],
-        price_supply = [100.0, 110.0, 120.0],
-        max_supply = [100.0, 110.0, 120.0],
-        supply_flow = zeros(3, 3),  # 3 segments × 3 time steps
+        supply = OrderedDict(
+            :seg1 => MacroEnergy.SupplySegment(price = [10.0, 11.0, 12.0], min = [0.0], max = [100.0]),
+            :seg2 => MacroEnergy.SupplySegment(price = [110.0], min = [0.0], max = [110.0]),
+            :seg3 => MacroEnergy.SupplySegment(price = [120.0], min = [0.0], max = [120.0]),
+        ),
+        supply_flow = [12.0 15.0 18.0; 0.0 0.0 0.0; 0.0 0.0 0.0],
         non_served_demand = [1.0 2.0 3.0; 4.0 5.0 6.0; 7.0 8.0 9.0],
         max_nsd=[10.0, 11.0, 12.0],
         price_nsd = [100.0, 110.0, 120.0],
@@ -126,7 +133,7 @@ function test_writing_output()
         )
     )
 
-    edge_between_nodes = Edge{Electricity}(;
+    edge_between_nodes = UnidirectionalEdge{Electricity}(;
         id=:edge1,
         start_vertex=node1,
         end_vertex=node2,
@@ -141,7 +148,7 @@ function test_writing_output()
         flow=[1.0, 2.0, 3.0]
     )
 
-    edge_to_storage = Edge{Electricity}(;
+    edge_to_storage = UnidirectionalEdge{Electricity}(;
         id=:edge2,
         start_vertex=node1,
         end_vertex=storage,
@@ -156,7 +163,7 @@ function test_writing_output()
         flow=[4.0, 5.0, 6.0]
     )
 
-    edge_to_transformation = Edge{Electricity}(;
+    edge_to_transformation = UnidirectionalEdge{Electricity}(;
         id=:edge3,
         start_vertex=node1,
         end_vertex=transformation,
@@ -172,7 +179,7 @@ function test_writing_output()
         flow=[7.0, 8.0, 9.0]
     )
 
-    edge_from_storage = Edge{Electricity}(;
+    edge_from_storage = UnidirectionalEdge{Electricity}(;
         id=:edge4,
         start_vertex=storage,
         end_vertex=node2,
@@ -187,7 +194,7 @@ function test_writing_output()
         flow=[10.0, 11.0, 12.0]
     )
 
-    edge_from_transformation = Edge{Electricity}(;
+    edge_from_transformation = UnidirectionalEdge{Electricity}(;
         id=:edge5,
         start_vertex=transformation,
         end_vertex=node2,
@@ -202,7 +209,7 @@ function test_writing_output()
         flow=[13.0, 14.0, 15.0]
     )
 
-    edge_storage_transformation = Edge{Electricity}(;
+    edge_storage_transformation = UnidirectionalEdge{Electricity}(;
         id=:edge6,
         start_vertex=storage,
         end_vertex=transformation,
@@ -217,7 +224,7 @@ function test_writing_output()
         flow=[16.0, 17.0, 18.0]
     )
 
-    edge_from_transformation1 = Edge{NaturalGas}(;
+    edge_from_transformation1 = UnidirectionalEdge{NaturalGas}(;
         id=:edge3ng,
         start_vertex=transformation,
         end_vertex=node1,
@@ -232,7 +239,7 @@ function test_writing_output()
         flow=[7.0, 8.0, 9.0]
     )
 
-    edge_from_transformation2 = Edge{CO2}(;
+    edge_from_transformation2 = UnidirectionalEdge{CO2}(;
         id=:edge3co2,
         start_vertex=transformation,
         end_vertex=node1,
@@ -372,7 +379,7 @@ function test_writing_output()
         @test result[1, :resource_id] == :asset1
         @test result[1, :component_id] == :edge1
         @test result[1, :resource_type] == "ThermalPower{NaturalGas}"
-        @test result[1, :component_type] == "Edge{Electricity}"
+        @test result[1, :component_type] == "UnidirectionalEdge{Electricity}"
         @test result[1, :variable] == :capacity
         @test result[1, :year] === missing
         @test result[1, :value] == 200.0
@@ -397,7 +404,7 @@ function test_writing_output()
         @test result[1, :resource_id] == :asset1
         @test result[1, :component_id] == :edge1
         @test result[1, :resource_type] == "ThermalPower{NaturalGas}"
-        @test result[1, :component_type] == "Edge{Electricity}"
+        @test result[1, :component_type] == "UnidirectionalEdge{Electricity}"
         @test result[1, :variable] == :flow
         @test result[1, :year] === missing
         @test result[1, :time] === 1
@@ -629,7 +636,7 @@ function test_writing_output()
             id=:vre_transform,
             timedata=vre_timedata
         )
-        vre_edge = Edge{Electricity}(;
+        vre_edge = UnidirectionalEdge{Electricity}(;
             id=:vre_edge,
             start_vertex=vre_transform,
             end_vertex=node1,
@@ -1033,7 +1040,13 @@ function test_writing_output()
             subperiod_weight(edge_to_storage, current_subperiod(edge_to_storage, t)) * price(start_vertex(edge_to_storage), t) * value(flow(edge_to_storage, t))
             for t in time_interval(edge_to_storage)
         )
+        # Note: edge_between_nodes (edge1) is not part of any system asset and is not
+        # returned by get_edges(system), so it does not contribute to attributed fuel costs.
         fuel_raw_total = fuel_raw_transformation + fuel_raw_storage
+        supply_raw_total = sum(
+            subperiod_weight(node1, current_subperiod(node1, t)) * price_supply(node1, s, t) * value(supply_flow(node1, s, t))
+            for s in supply_segments(node1), t in time_interval(node1)
+        )
         # NonServedDemand from node1: sum over segment and time of (weight * price_nsd * nsd)
         nsd_raw_total = sum(
             subperiod_weight(node1, current_subperiod(node1, t)) * price_non_served_demand(node1, s) * value(non_served_demand(node1, s, t))
@@ -1062,8 +1075,8 @@ function test_writing_output()
         @test detailed_undisc.value[detailed_undisc.category .== :Investment] ≈ [inv_cf * new_cap_val]
         # VariableOM: raw * period_length
         @test detailed_undisc.value[detailed_undisc.category .== :VariableOM] ≈ [variable_om_raw * period_length]
-        # Fuel: raw * period_length (sum of all edges with fuel cost)
         @test sum(detailed_undisc.value[detailed_undisc.category .== :Fuel]) ≈ fuel_raw_total * period_length
+        @test sum(detailed_undisc.value[detailed_undisc.category .== :Supply]) ≈ (supply_raw_total - fuel_raw_total) * period_length
         # NonServedDemand: raw * period_length (from nodes with non_served_demand)
         @test sum(detailed_undisc.value[detailed_undisc.category .== :NonServedDemand]) ≈ nsd_raw_total * period_length
 
@@ -1079,8 +1092,8 @@ function test_writing_output()
         @test detailed_disc.value[detailed_disc.category .== :Investment] ≈ [inv_pv]
         # VariableOM: raw * discount_factor * opexmult
         @test detailed_disc.value[detailed_disc.category .== :VariableOM] ≈ [variable_om_raw * discount_factor * opexmult]
-        # Fuel: raw * discount_factor * opexmult (sum of all edges with fuel cost)
         @test sum(detailed_disc.value[detailed_disc.category .== :Fuel]) ≈ fuel_raw_total * discount_factor * opexmult
+        @test sum(detailed_disc.value[detailed_disc.category .== :Supply]) ≈ (supply_raw_total - fuel_raw_total) * discount_factor * opexmult
         # NonServedDemand: raw * discount_factor * opexmult
         @test sum(detailed_disc.value[detailed_disc.category .== :NonServedDemand]) ≈ nsd_raw_total * discount_factor * opexmult
 

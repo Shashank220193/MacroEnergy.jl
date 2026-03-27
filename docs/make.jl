@@ -79,6 +79,7 @@ const pages = [
             "Manual/assets/battery.md",
             "Manual/assets/beccselectricity.md",
             "Manual/assets/beccshydrogen.md",
+            "Manual/assets/downstreamemissions.md",
             "Manual/assets/electricdac.md",
             "Manual/assets/electricheating.md",
             "Manual/assets/electricsteam.md",
@@ -92,6 +93,7 @@ const pages = [
             "Manual/assets/integrateddirectreductionelectricarcfurnace.md",
             "Manual/assets/mustrun.md",
             "Manual/assets/natgasdaq.md",
+            "Manual/assets/onewaytransmissionlink.md",
             "Manual/assets/standalonelectricarcfurnace.md",
             "Manual/assets/syntheticammonia.md",
             "Manual/assets/syntheticmethanol.md",
@@ -100,6 +102,7 @@ const pages = [
             "Manual/assets/thermalmethanol.md",
             "Manual/assets/thermalpower.md",
             "Manual/assets/transmissionlink.md",
+            "Manual/assets/upstreamemissions.md",
             "Manual/assets/vre.md"
         ],
         "Financial Assumptions" => "Manual/Financial_assumptions.md",
